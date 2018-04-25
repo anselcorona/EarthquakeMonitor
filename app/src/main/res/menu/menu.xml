@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/last_month"
+        android:icon="@drawable/refresh"
+        android:title="Last 30 days" />
+    <item
+        android:id="@+id/last_week"
+        android:icon="@drawable/refresh"
+        android:title="Last Week"/>
+    <item
+        android:id="@+id/today"
+        android:icon="@drawable/refresh"
+        android:title="Today" />
+</menu>
