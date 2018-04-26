@@ -4,6 +4,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 public class DetailActivity extends AppCompatActivity {
 
     @Override
@@ -27,8 +32,12 @@ public class DetailActivity extends AppCompatActivity {
         Lat.setText(latitud.toString());
         String lugar = e.getLocation();
         Place.setText(lugar);
-        String fecha = e.getDate();
-        Date.setText(fecha);
+        Long longdate = e.getDate();
+        java.util.Date date = new Date(longdate);
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        format.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
+        String formatted = format.format(date);
+        Date.setText(formatted);
 
     }
 }

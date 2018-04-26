@@ -11,9 +11,9 @@ public class Earthquake implements Parcelable {
     private Double Longitude;
     private Double Latitude;
     private Double Magnitude;
-    private String date;
+    private Long date;
 
-    public Earthquake(String location, Double longitude, Double latitude, Double magnitude, String date) {
+    public Earthquake(String location, Double longitude, Double latitude, Double magnitude, Long date) {
         Location = location;
         Longitude = longitude;
         Latitude = latitude;
@@ -53,11 +53,11 @@ public class Earthquake implements Parcelable {
         Magnitude = magnitude;
     }
 
-    public String getDate() {
+    public Long getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(Long date) {
         this.date = date;
     }
 
@@ -66,7 +66,7 @@ public class Earthquake implements Parcelable {
         Longitude = in.readByte() == 0x00 ? null : in.readDouble();
         Latitude = in.readByte() == 0x00 ? null : in.readDouble();
         Magnitude = in.readByte() == 0x00 ? null : in.readDouble();
-        date = in.readString();
+        date = in.readByte() == 0x00 ? null : in.readLong();
     }
 
     @Override
@@ -95,7 +95,12 @@ public class Earthquake implements Parcelable {
             dest.writeByte((byte) (0x01));
             dest.writeDouble(Magnitude);
         }
-        dest.writeString(date);
+        if (date == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeLong(date);
+        }
     }
 
     @SuppressWarnings("unused")

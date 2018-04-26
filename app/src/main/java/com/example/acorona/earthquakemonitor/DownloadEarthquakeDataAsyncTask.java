@@ -1,6 +1,13 @@
 package com.example.acorona.earthquakemonitor;
 
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,29 +16,79 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
-public class DownloadEarthquakeDataAsyncTask extends AsyncTask<URL, Void, String>{
+import static com.example.acorona.earthquakemonitor.EarthquakeContract.EarthquakeColumns.TABLE_NAME;
+
+public class DownloadEarthquakeDataAsyncTask extends AsyncTask<URL, Void, ArrayList<Earthquake>>{
     public DownloadEarthquakeInterface delegate;
-
+    Context context;
+    DownloadEarthquakeDataAsyncTask(Context context){
+        this.context = context;
+    }
     public interface DownloadEarthquakeInterface{
-        void onEarthquakesDownloaded(String data);
+        void onEarthquakesDownloaded(ArrayList<Earthquake> eqList);
     }
     @Override
-    protected String doInBackground(URL... urls) {
-        String data = "";
-
+    protected ArrayList<Earthquake> doInBackground(URL... urls) {
+        String data;
+        ArrayList<Earthquake> list = null;
         try{
             data = downloadData(urls[0]);
+            list = parseDataFromJson(data);
+            saveEarthquakeDatabase(list);
         }catch(IOException e){
             e.printStackTrace();
         }
-        return data;
+        return list;
+    }
+
+    private void saveEarthquakeDatabase(ArrayList<Earthquake> list) {
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_NAME);
+        for(Earthquake e : list){
+            ContentValues cv = new ContentValues();
+            cv.put(EarthquakeContract.EarthquakeColumns.MAGNITUDE,e.getMagnitude());
+            cv.put(EarthquakeContract.EarthquakeColumns.PLACE,e.getLocation());
+            cv.put(EarthquakeContract.EarthquakeColumns.LONGITUDE,e.getLongitude());
+            cv.put(EarthquakeContract.EarthquakeColumns.LATITUDE,e.getLatitude());
+            cv.put(EarthquakeContract.EarthquakeColumns.TIMESTAMP,e.getDate());
+
+            db.insert(TABLE_NAME, null, cv);
+
+        }
+
+    }
+
+    private ArrayList<Earthquake> parseDataFromJson(String data) {
+        ArrayList<Earthquake> eqList = new ArrayList<>();
+        try{
+            JSONObject jsonObject = new JSONObject(data);
+            JSONArray jsonArray = jsonObject.getJSONArray("features");
+
+            for(int i=0; i<jsonArray.length(); i++){
+                JSONObject featuresjsonObject = jsonArray.getJSONObject(i);
+                JSONObject propertiesJsonObject = featuresjsonObject.getJSONObject("properties");
+                double magnitude = propertiesJsonObject.getDouble("mag");
+                String place = propertiesJsonObject.getString("place");
+                JSONObject geometryJsonObject = featuresjsonObject.getJSONObject("geometry");
+                JSONArray coordinatesJsonArray = geometryJsonObject.getJSONArray("coordinates");
+                double longitude = coordinatesJsonArray.getDouble(0);
+                double latitude = coordinatesJsonArray.getDouble(1);
+                Long longdate = propertiesJsonObject.getLong("time");
+                eqList.add(new Earthquake(place,longitude,latitude,magnitude, longdate));
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+        return eqList;
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-        delegate.onEarthquakesDownloaded(s);
+    protected void onPostExecute(ArrayList<Earthquake> eqList) {
+        super.onPostExecute(eqList);
+        delegate.onEarthquakesDownloaded(eqList);
     }
 
     private String downloadData(URL url) throws IOException{
