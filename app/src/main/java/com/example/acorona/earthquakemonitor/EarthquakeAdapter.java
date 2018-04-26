@@ -43,7 +43,14 @@ public class EarthquakeAdapter extends ArrayAdapter<Earthquake> {
 
 
         Earthquake earthquake = EarthquakeList.get(position);
-        holder.magnitude.setText(earthquake.getMagnitude().toString());
+        Double magnitude = earthquake.getMagnitude();
+        Double five = 5.000;
+        if(magnitude-five>=0){
+            holder.magnitude.setTextColor(context.getResources().getColor(R.color.colorAccent));
+        }else{
+            holder.magnitude.setTextColor(context.getResources().getColor(R.color.black));
+        }
+        holder.magnitude.setText(String.valueOf(magnitude));
         holder.location.setText(earthquake.getLocation());
 
 
