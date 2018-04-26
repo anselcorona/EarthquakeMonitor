@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Earthquake Monitor</string>
+    <string name="refresh">Refresh</string>
+    <string name="month">Last 30 days</string>
+    <string name="week">Last Week</string>
+    <string name="today">Today</string>
+    <string name="rScale">Richter</string>
+    <string name="placeholder_double">4.6</string>
+    <string name="description_gps">Location icon</string>
+    <string name="description_clock">Clock icon</string>
+    <string name="description_info">Information icon</string>
+    <string name="lon">Longitude</string>
+    <string name="lat">Latitude</string>
+    <string name="date">Date</string>
+    <string name="loca">location</string>
+
 </resources>

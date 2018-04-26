@@ -15,7 +15,6 @@ import android.widget.Toast;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
                             e.printStackTrace();
                         }
                     }else{
-                        Toast.makeText(MainActivity.this, "Error de la conexión", Toast.LENGTH_LONG);
+                        Toast.makeText(MainActivity.this, "Error de la conexión", Toast.LENGTH_LONG).show();
                     }
 
             }
@@ -55,11 +54,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
             @Override
             public boolean onMenuItemSelected(MenuItem menuItem) {
                 if (Utils.isNetworkAvailable(MainActivity.this)) {
-                    try {
                         downloadData(menuItem);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
                 }else{
                     try{
                         getEarthquakesFromDatabase(menuItem);
@@ -72,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
         });
     }
 
-    private void getEarthquakesFromDatabase(MenuItem menuItem) throws ParseException {
+    private void getEarthquakesFromDatabase(MenuItem menuItem){
         DbHelper dbHelper = new DbHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -82,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
 
         switch (menuItem.getItemId()) {
             case R.id.refresh:
-                Toast.makeText(MainActivity.this, "Error de la conexión", Toast.LENGTH_LONG);
+                Toast.makeText(MainActivity.this, "Error de la conexión", Toast.LENGTH_LONG).show();
                 break;
             case R.id.last_month:
                     c.add(Calendar.MONTH, -1);
@@ -144,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
         });
     }
 
-    public void downloadData(MenuItem menuItem) throws ParseException {
+    public void downloadData(MenuItem menuItem){
         DownloadEarthquakeDataAsyncTask downloadEarthquakeDataAsyncTask = new DownloadEarthquakeDataAsyncTask(MainActivity.this);
         downloadEarthquakeDataAsyncTask.delegate = MainActivity.this;
         switch (menuItem.getItemId()) {

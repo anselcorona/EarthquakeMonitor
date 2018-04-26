@@ -3,17 +3,17 @@
     <item
         android:id="@+id/refresh"
         android:icon="@drawable/refresh"
-        android:title="Refresh"/>
+        android:title="@string/refresh"/>
     <item
         android:id="@+id/last_month"
         android:icon="@drawable/ic_clock_grey600_18dp"
-        android:title="Last 30 days" />
+        android:title="@string/month" />
     <item
         android:id="@+id/last_week"
         android:icon="@drawable/ic_clock_grey600_18dp"
-        android:title="Last Week"/>
+        android:title="@string/week"/>
     <item
         android:id="@+id/today"
         android:icon="@drawable/ic_clock_grey600_18dp"
-        android:title="Today" />
+        android:title="@string/today" />
 </menu>

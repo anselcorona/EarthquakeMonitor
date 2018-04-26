@@ -22,7 +22,7 @@ import static com.example.acorona.earthquakemonitor.EarthquakeContract.Earthquak
 
 public class DownloadEarthquakeDataAsyncTask extends AsyncTask<URL, Void, ArrayList<Earthquake>>{
     public DownloadEarthquakeInterface delegate;
-    Context context;
+    private Context context;
     DownloadEarthquakeDataAsyncTask(Context context){
         this.context = context;
     }
