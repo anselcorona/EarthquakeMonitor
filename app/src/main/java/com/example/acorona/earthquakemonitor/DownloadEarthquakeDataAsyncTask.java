@@ -54,9 +54,7 @@ public class DownloadEarthquakeDataAsyncTask extends AsyncTask<URL, Void, ArrayL
             cv.put(EarthquakeContract.EarthquakeColumns.LONGITUDE,e.getLongitude());
             cv.put(EarthquakeContract.EarthquakeColumns.LATITUDE,e.getLatitude());
             cv.put(EarthquakeContract.EarthquakeColumns.TIMESTAMP,e.getDate());
-
             db.insert(TABLE_NAME, null, cv);
-
         }
 
     }

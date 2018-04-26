@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/last_month"
+        android:id="@+id/refresh"
         android:icon="@drawable/refresh"
+        android:title="Refresh"/>
+    <item
+        android:id="@+id/last_month"
+        android:icon="@drawable/ic_clock_grey600_18dp"
         android:title="Last 30 days" />
     <item
         android:id="@+id/last_week"
-        android:icon="@drawable/refresh"
+        android:icon="@drawable/ic_clock_grey600_18dp"
         android:title="Last Week"/>
     <item
         android:id="@+id/today"
-        android:icon="@drawable/refresh"
+        android:icon="@drawable/ic_clock_grey600_18dp"
         android:title="Today" />
 </menu>

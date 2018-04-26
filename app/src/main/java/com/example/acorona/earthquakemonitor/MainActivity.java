@@ -3,12 +3,14 @@ package com.example.acorona.earthquakemonitor;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 
 import java.net.MalformedURLException;
@@ -23,20 +25,41 @@ import io.github.yavski.fabspeeddial.SimpleMenuListenerAdapter;
 
 public class MainActivity extends AppCompatActivity implements DownloadEarthquakeDataAsyncTask.DownloadEarthquakeInterface {
     private ListView eList;
-
+    SwipeRefreshLayout swipeRefreshLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                    if (Utils.isNetworkAvailable(MainActivity.this)) {
+                        try {
+                            URL url = new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson");
+                            Refresh(url);
+
+                        } catch (MalformedURLException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        Toast.makeText(MainActivity.this, "Error de la conexión", Toast.LENGTH_LONG);
+                    }
+
+            }
+        });
         eList = findViewById(R.id.e_list);
 
         FabSpeedDial fabSpeedDial = findViewById(R.id.speed_dial);
         fabSpeedDial.setMenuListener(new SimpleMenuListenerAdapter() {
             @Override
             public boolean onMenuItemSelected(MenuItem menuItem) {
-
                 if (Utils.isNetworkAvailable(MainActivity.this)) {
-                    downloadData(menuItem);
+                    try {
+                        downloadData(menuItem);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }else{
                     try{
                         getEarthquakesFromDatabase(menuItem);
@@ -58,6 +81,9 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
         Cursor cursor;
 
         switch (menuItem.getItemId()) {
+            case R.id.refresh:
+                Toast.makeText(MainActivity.this, "Error de la conexión", Toast.LENGTH_LONG);
+                break;
             case R.id.last_month:
                     c.add(Calendar.MONTH, -1);
                     result = c.getTimeInMillis();
@@ -118,11 +144,11 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
         });
     }
 
-    public void downloadData(MenuItem menuItem) {
+    public void downloadData(MenuItem menuItem) throws ParseException {
         DownloadEarthquakeDataAsyncTask downloadEarthquakeDataAsyncTask = new DownloadEarthquakeDataAsyncTask(MainActivity.this);
         downloadEarthquakeDataAsyncTask.delegate = MainActivity.this;
         switch (menuItem.getItemId()) {
-            case R.id.last_month:
+            case R.id.refresh:
                 try {
                     URL url = new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson");
                     Refresh(url);
@@ -130,21 +156,14 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
                     e.printStackTrace();
                 }
                 break;
+            case R.id.last_month:
+                getEarthquakesFromDatabase(menuItem);
+                break;
             case R.id.last_week:
-                try {
-                    URL url = new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson");
-                    Refresh(url);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                getEarthquakesFromDatabase(menuItem);
                 break;
             case R.id.today:
-                try {
-                    URL url = new URL("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson");
-                    Refresh(url);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                }
+                getEarthquakesFromDatabase(menuItem);
                 break;
         }
     }
@@ -153,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
         DownloadEarthquakeDataAsyncTask e = new DownloadEarthquakeDataAsyncTask(this);
         e.delegate = this;
         e.execute(url);
+
     }
 
 
@@ -160,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements DownloadEarthquak
     public void onEarthquakesDownloaded(ArrayList<Earthquake> eqList) {
         final EarthquakeAdapter earthquakeAdapter = new EarthquakeAdapter(this, R.layout.eq_listitem, eqList);
         eList.setAdapter(earthquakeAdapter);
+        swipeRefreshLayout.setRefreshing(false);
         eList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
